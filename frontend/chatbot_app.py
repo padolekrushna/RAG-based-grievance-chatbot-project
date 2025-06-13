@@ -1,7 +1,7 @@
 import streamlit as st
 from chatbot_logic import detect_intent
 from api_handler import register_complaint, get_status
-
+from chatbot_logic import call_llm, parse_llm_response
 st.title("🛠️ Grievance Chatbot")
 st.write("Talk to the bot to register a complaint or check its status.")
 
@@ -14,7 +14,9 @@ user_input = st.text_input("You:", key="input")
 
 if user_input:
     st.session_state.chat.append(("user", user_input))
-    intent = detect_intent(user_input)
+    llm_raw = call_llm(user_input)
+    llm_result = parse_llm_response(llm_raw)
+    intent = llm_result.get("intent", "unknown")
 
     if intent == "register":
         # Collect user details step-by-step
